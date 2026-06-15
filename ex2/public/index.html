@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Minha Coleção de Plantas de Interior</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f0f7f4; color: #2d4a22; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h1 { text-align: center; color: #3a7a3a; }
+        .form-group { margin-bottom: 15px; }
+        label { font-weight: bold; color: #4a5d4e; }
+        input[type="text"], input[type="number"], select { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; border: 1px solid #c8d9c5; border-radius: 6px; }
+        button { border: none; padding: 10px 15px; cursor: pointer; border-radius: 6px; font-weight: bold; transition: background 0.2s; }
+        button.add { background-color: #4CAF50; color: white; width: 100%; font-size: 1.1em; }
+        button.add:hover { background-color: #45a049; }
+        button.delete { background-color: #e57373; color: white; padding: 6px 12px; }
+        button.delete:hover { background-color: #ef5350; }
+        button.toggle { background-color: #64b5f6; color: white; padding: 6px 12px; }
+        button.toggle:hover { background-color: #42a5f5; }
+        .planta-item { border-bottom: 1px solid #e0ebe0; padding: 15px 0; display: flex; justify-content: space-between; align-items: center; }
+        .planta-item:last-child { border-bottom: none; }
+        .planta-info strong { font-size: 1.2em; color: #2e592e; }
+        .actions { display: flex; gap: 10px; }
+        .search-bar { margin-bottom: 30px; }
+        .form-container { background: #f9fdf9; padding: 20px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #e0ebe0; }
+        .badge { display: inline-block; padding: 5px 10px; border-radius: 15px; font-size: 0.85em; font-weight: bold; margin-top: 8px; }
+        .badge-regada { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .badge-secar { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+    </style>
+</head>
+<body>
+
+<div id="app" class="container">
+    <h1>A Minha Selva Urbana 🌿</h1>
+
+    <div class="search-bar">
+        <input type="text" v-model="searchQuery" @input="fetchPlantas" placeholder="Pesquisar por nome comum ou espécie... (?search=X)">
+    </div>
+
+    <div class="form-container">
+        <h3>Adicionar Nova Planta</h3>
+        <form @submit.prevent="addPlanta">
+            <div class="form-group">
+                <label>Nome Comum (ex: Costela de Adão):</label>
+                <input type="text" v-model="novaPlanta.nome" required>
+            </div>
+            <div class="form-group">
+                <label>Espécie (ex: Monstera deliciosa):</label>
+                <input type="text" v-model="novaPlanta.especie" required>
+            </div>
+            <div class="form-group">
+                <label>Frequência de Rega (em dias):</label>
+                <input type="number" min="1" v-model="novaPlanta.diasRega" required>
+            </div>
+            <div class="form-group">
+                <label>Necessidade de Luz:</label>
+                <select v-model="novaPlanta.necessidadeLuz" required>
+                    <option value="" disabled>Seleciona uma opção...</option>
+                    <option value="Sombra">Sombra</option>
+                    <option value="Luz Indireta">Luz Indireta</option>
+                    <option value="Sol Direto">Sol Direto</option>
+                </select>
+            </div>
+            <button type="submit" class="add">Adicionar Planta 🪴</button>
+        </form>
+    </div>
+
+    <div>
+        <h3>As Minhas Plantas</h3>
+        <p v-if="plantas.length === 0" style="text-align: center; color: #7a9c7a;">Nenhuma planta encontrada. Está na hora de ir ao horto!</p>
+        
+        <div v-for="planta in plantas" :key="planta._id" class="planta-item">
+            <div class="planta-info">
+                <strong>{{ planta.nome }}</strong> <em>({{ planta.especie }})</em> <br>
+                Luz: {{ planta.necessidadeLuz }} | Regar a cada {{ planta.diasRega }} dias <br>
+                <span class="badge" :class="planta.regadaRecentemente ? 'badge-regada' : 'badge-secar'">
+                    {{ planta.regadaRecentemente ? '💧 Terra Húmida (Regada)' : '🏜️ Precisa de Água' }}
+                </span>
+            </div>
+            <div class="actions">
+                <button class="toggle" @click="toggleRega(planta)">
+                    {{ planta.regadaRecentemente ? 'Marcar Seca' : 'Regar Agora' }}
+                </button>
+                <button class="delete" @click="deletePlanta(planta._id)">Remover</button>
+            </div>
+        </div>
+    </div>
+    <footer style="margin-top: 40px; text-align: center; font-size: 0.9em; color: #7a9c7a; border-top: 1px solid #e0ebe0; padding-top: 15px;">
+        <p>Gerado por MyHorto desenvolvido no contexto de EngWeb2026</p>
+        <p>Data Atual: 15 de Junho de 2026</p>
+    </footer>
+</div>
+
+<script>
+    const { createApp } = Vue;
+    
+    // A API está a escutar na porta 19040, conforme o enunciado
+    const API_URL = 'http://localhost:19040/api/plantas';
+
+    createApp({
+        data() {
+            return {
+                plantas: [],
+                searchQuery: '',
+                novaPlanta: {
+                    nome: '',
+                    especie: '',
+                    diasRega: '',
+                    necessidadeLuz: ''
+                }
+            }
+        },
+        methods: {
+            // GET: Busca todas as plantas (com query string de pesquisa opcional)
+            async fetchPlantas() {
+                try {
+                    let url = API_URL;
+                    if (this.searchQuery.trim() !== '') {
+                        url += `?search=${encodeURIComponent(this.searchQuery)}`;
+                    }
+                    const response = await axios.get(url);
+                    this.plantas = response.data;
+                } catch (error) {
+                    console.error("Erro ao carregar as plantas:", error);
+                }
+            },
+            
+            // POST: Adiciona uma nova planta
+            async addPlanta() {
+                try {
+                    // O estado 'regadaRecentemente' deve ser tratado por defeito na API (ex: False)
+                    await axios.post(API_URL, this.novaPlanta);
+                    
+                    // Limpa o formulário
+                    this.novaPlanta = { nome: '', especie: '', diasRega: '', necessidadeLuz: '' };
+                    
+                    // Atualiza a lista
+                    this.fetchPlantas();
+                } catch (error) {
+                    console.error("Erro ao adicionar a planta:", error);
+                    alert("Erro ao adicionar planta. Verifica se a API Express está a correr na porta 19040.");
+                }
+            },
+            
+            // PUT: Alterna o estado booleano de rega
+            async toggleRega(planta) {
+                try {
+                    await axios.put(`${API_URL}/${planta._id}`, { 
+                        regadaRecentemente: !planta.regadaRecentemente 
+                    });
+                    this.fetchPlantas();
+                } catch (error) {
+                    console.error("Erro ao atualizar o estado da planta:", error);
+                }
+            },
+            
+            // DELETE: Remove uma planta
+            async deletePlanta(id) {
+                try {
+                    if(confirm("Tens a certeza que queres remover esta planta da coleção?")) {
+                        await axios.delete(`${API_URL}/${id}`);
+                        this.fetchPlantas();
+                    }
+                } catch (error) {
+                    console.error("Erro ao remover a planta:", error);
+                }
+            }
+        },
+        mounted() {
+            // Carrega os dados assim que a aplicação inicia
+            this.fetchPlantas();
+        }
+    }).mount('#app');
+</script>
+
+</body>
+</html>

@@ -1,42 +1,3 @@
-# ENGWEB2026 — Exame de Época de Recurso
-
-## Exercício 1 — O Mundo da Ópera (API de dados)
-
-### 1.1 Setup da Base de Dados
-
-O dataset unificado foi gerado pelo script `normalize_operas.py` a partir dos ficheiros `operas.json`, `compositores.json`, `teatros.json`, `arias.json` e `cantores.json`, produzindo o ficheiro `operas_normalized.json`.
-
-#### Passos para importar o dataset no MongoDB
-
-**1. Correr o container MongoDB (se ainda não estiver a correr):**
-```bash
-docker run -d --name mongoEW -p 27017:27017 mongo
-```
-
-**2. Copiar o dataset para o container:**
-dentro da pasta datasets, executar:
-```bash
-docker cp operas_normalized.json mongoEW:/tmp/operas_normalized.json
-```
-
-**3. Importar o dataset na base de dados:**
-```bash
-docker exec mongoEW mongoimport -d operas_db -c operas /tmp/operas_normalized.json --jsonArray
-```
-
-**4. Verificar a importação:**
-```bash
-docker exec -it mongoEW mongosh
-use operas_db
-db.operas.countDocuments()
-# Esperado: 20
-db.operas.findOne()
-```
-
----
-
-### 1.2 Queries MongoDB
-
 #### 1. Quantas óperas estão registadas na base de dados?
 ```js
 db.operas.countDocuments()
@@ -92,29 +53,3 @@ db.operas.find(
 // { title: "Madama Butterfly",       premiereYear: 1904 }
 // { title: "Turandot",               premiereYear: 1926 }
 ```
-
----
-
-## Exercício 2 — A Minha Coleção de Plantas de Interior
-
-*(ver pasta `ex2`)*
-
----
-
-## Instruções de Execução
-
-### Exercício 1 (com Docker Compose)
-```bash
-cd ex1
-docker-compose up --build
-```
-- API disponível em: http://localhost:17060
-- Swagger UI em: http://localhost:17060/api-docs
-
-### Exercício 2 (com Docker Compose)
-```bash
-cd ex2
-docker-compose up --build
-```
-- Interface (Nginx): http://localhost:19041
-- API de dados: http://localhost:19040/api/plantas

@@ -1,0 +1,72 @@
+[
+  {
+    "nome": "Espada-de-São-Jorge",
+    "especie": "Sansevieria trifasciata",
+    "diasRega": 14,
+    "necessidadeLuz": "Luz Indireta",
+    "regadaRecentemente": false
+  },
+  {
+    "nome": "Pothos Dourado",
+    "especie": "Epipremnum aureum",
+    "diasRega": 7,
+    "necessidadeLuz": "Sombra",
+    "regadaRecentemente": false
+  },
+  {
+    "nome": "Orquídea Phalaenopsis",
+    "especie": "Phalaenopsis amabilis",
+    "diasRega": 10,
+    "necessidadeLuz": "Luz Indireta",
+    "regadaRecentemente": false
+  },
+  {
+    "nome": "Cacto Bola de Ouro",
+    "especie": "Echinocactus grusonii",
+    "diasRega": 21,
+    "necessidadeLuz": "Sol Direto",
+    "regadaRecentemente": false
+  },
+  {
+    "nome": "Ficus Lyrata",
+    "especie": "Ficus lyrata",
+    "diasRega": 7,
+    "necessidadeLuz": "Luz Indireta",
+    "regadaRecentemente": true
+  },
+  {
+    "nome": "Suculenta Echeveria",
+    "especie": "Echeveria elegans",
+    "diasRega": 14,
+    "necessidadeLuz": "Sol Direto",
+    "regadaRecentemente": false
+  },
+  {
+    "nome": "Costela-de-Adão",
+    "especie": "Monstera deliciosa",
+    "diasRega": 7,
+    "necessidadeLuz": "Luz Indireta",
+    "regadaRecentemente": true
+  },
+  {
+    "nome": "Zamioculca",
+    "especie": "Zamioculcas zamiifolia",
+    "diasRega": 14,
+    "necessidadeLuz": "Sombra",
+    "regadaRecentemente": false
+  },
+  {
+    "nome": "Palmeira Areca",
+    "especie": "Dypsis lutescens",
+    "diasRega": 5,
+    "necessidadeLuz": "Luz Indireta",
+    "regadaRecentemente": false
+  },
+  {
+    "nome": "Hera Comum",
+    "especie": "Hedera helix",
+    "diasRega": 7,
+    "necessidadeLuz": "Sombra",
+    "regadaRecentemente": true
+  }
+]

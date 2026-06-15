@@ -1,0 +1,90 @@
+openapi: 3.0.0
+info:
+  title: API O Mundo da Ópera - Engenharia Web 2026 (Recurso)
+  version: 1.0.0
+  description: API de dados desenvolvida para o Exercício 1 do Exame de Recurso
+servers:
+  - url: http://localhost:17060
+    description: Servidor Local (Docker)
+paths:
+  /operas:
+    get:
+      summary: Devolve a lista de óperas (opcionalmente filtrada por género)
+      description: Se o parâmetro 'genre' for omitido, devolve todas as óperas com campos resumidos (id, title, premiereYear, compositor.name, teatro.country). Se for incluído, devolve as óperas desse género (id, title, premiereYear).
+      parameters:
+        - name: genre
+          in: query
+          required: false
+          description: Filtra as óperas pelo género (ex. Opera buffa)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Sucesso.
+    post:
+      summary: Acrescenta um registo novo à BD (uma nova ópera)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Ópera criada com sucesso.
+  /operas/{id}:
+    get:
+      summary: Devolve toda a informação da ópera com o identificador passado
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detalhes da ópera encontrados.
+        '404':
+          description: Ópera não encontrada.
+    put:
+      summary: Altera o registo da ópera com o identificador passado
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Ópera atualizada com sucesso.
+    delete:
+      summary: Elimina da BD o registo correspondente à ópera com o identificador passado
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ópera eliminada com sucesso.
+  /cantores:
+    get:
+      summary: Lista dos cantores ordenada alfabeticamente por nome e sem repetições
+      description: Lista de pares (nome do cantor, lista de óperas em que cantou).
+      responses:
+        '200':
+          description: Sucesso.
+  /teatros:
+    get:
+      summary: Lista dos teatros ordenada alfabeticamente e sem repetições
+      description: Lista com (nome do teatro, país e lista de óperas que lá estrearam).
+      responses:
+        '200':
+          description: Sucesso.

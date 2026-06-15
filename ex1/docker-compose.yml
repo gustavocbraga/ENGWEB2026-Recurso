@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: ex1_mongodb_operas
+    volumes:
+      - mongo_data_operas:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  importador:
+    build: .
+    container_name: ex1_importador_operas
+    command: node dataset/importar.js
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/operas_db
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  api:
+    build: .
+    container_name: ex1_api_operas
+    ports:
+      - "17060:17060"
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/operas_db
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    restart: always
+
+volumes:
+  mongo_data_operas:
