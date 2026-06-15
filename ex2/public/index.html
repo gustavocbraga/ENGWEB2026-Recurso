@@ -88,11 +88,20 @@
             </div>
         </div>
     </div>
+
     <footer style="margin-top: 40px; text-align: center; font-size: 0.9em; color: #7a9c7a; border-top: 1px solid #e0ebe0; padding-top: 15px;">
         <p>Gerado por MyHorto desenvolvido no contexto de EngWeb2026</p>
-        <p>Data Atual: 15 de Junho de 2026</p>
+        <p id="data-atual"></p>
     </footer>
 </div>
+
+<script>
+    // Data dinâmica no footer
+    const hoje = new Date();
+    const opcoes = { day: 'numeric', month: 'long', year: 'numeric' };
+    const dataFormatada = hoje.toLocaleDateString('pt-PT', opcoes);
+    document.getElementById('data-atual').textContent = 'Data Atual: ' + dataFormatada;
+</script>
 
 <script>
     const { createApp } = Vue;
@@ -131,13 +140,8 @@
             // POST: Adiciona uma nova planta
             async addPlanta() {
                 try {
-                    // O estado 'regadaRecentemente' deve ser tratado por defeito na API (ex: False)
                     await axios.post(API_URL, this.novaPlanta);
-                    
-                    // Limpa o formulário
                     this.novaPlanta = { nome: '', especie: '', diasRega: '', necessidadeLuz: '' };
-                    
-                    // Atualiza a lista
                     this.fetchPlantas();
                 } catch (error) {
                     console.error("Erro ao adicionar a planta:", error);
@@ -170,7 +174,6 @@
             }
         },
         mounted() {
-            // Carrega os dados assim que a aplicação inicia
             this.fetchPlantas();
         }
     }).mount('#app');
